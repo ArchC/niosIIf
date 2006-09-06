@@ -1,0 +1,44 @@
+/********************************************************/
+/* The ArchC NIOSII functional model.                   */
+/* Author: Richard Maciel                               */
+/*         Guilherme Quentel Melo                       */
+/*                                                      */
+/* For more information on ArchC, please visit:         */
+/* http://www.archc.org                                 */
+/*                                                      */
+/* System Design Automation Lab (LAPS)                  */
+/* INE-UFSC                                             */
+/* http://www.laps.inf.ufsc.br                          */
+/*                                                      */
+/* The ArchC Team                                       */
+/* Computer Systems Laboratory (LSC)                    */
+/* IC-UNICAMP                                           */
+/* http://www.lsc.ic.unicamp.br                         */
+/********************************************************/
+
+AC_ARCH(niosIIf)
+{
+  ac_wordsize 32;
+  ac_regbank RB:32;
+
+  ac_reg status_reg_pie;
+  ac_reg status_reg_user;
+
+  ac_reg estatus_reg_pie;
+  ac_reg estatus_reg_user;
+
+  ac_reg bstatus_reg_pie;
+  ac_reg bstatus_reg_user;
+
+  ac_reg ienable_reg;
+  ac_reg ipending_reg;
+
+  ac_mem DC:128M;
+
+  ARCH_CTOR(niosIIf)
+  {
+    ac_isa("niosIIf-isa.ac");
+    set_endian("little");
+  };
+
+};

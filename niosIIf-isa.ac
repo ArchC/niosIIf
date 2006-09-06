@@ -1,0 +1,382 @@
+/********************************************************/
+/* The ArchC NIOSII functional model.                   */
+/* Author: Richard Maciel                               */
+/*         Guilherme Quentel Melo                       */
+/*                                                      */
+/* For more information on ArchC, please visit:         */
+/* http://www.archc.org                                 */
+/*                                                      */
+/* System Design Automation Lab (LAPS)                  */
+/* INE-UFSC                                             */
+/* http://www.laps.inf.ufsc.br                          */
+/*                                                      */
+/* The ArchC Team                                       */
+/* Computer Systems Laboratory (LSC)                    */
+/* IC-UNICAMP                                           */
+/* http://www.lsc.ic.unicamp.br                         */
+/********************************************************/
+
+AC_ISA(niosII)
+{
+  ac_format Type_I = "%op:6 %imm16:16:s %rB:5 %rA:5";
+  ac_format Type_R = "%op:6 %imm5:5 %func:6 %rC:5 %rB:5 %rA:5";
+  ac_format Type_J = "%op:6 %imm26:26";
+  ac_format Type_C = "%op:6 %number:8 %readrc:1 %readrb:1 %readra:1 %rC:5 %rB:5 %rA:5";
+
+  ac_instr<Type_I> addi, andhi, andi, beq, bge, bgeu, blt, bltu, bne, br, cmplti, cmpeqi;
+  ac_instr<Type_I> cmpgei, cmpgeui, cmpltui, cmpnei;
+  ac_instr<Type_I> flushd, initd, ldb, ldbio, ldbu, ldbuio, ldh, ldhio, ldhu, ldhuio;
+  ac_instr<Type_I> ldw, ldwio, muli, ori, orhi, stb, stbio, sth, sthio, stw, stwio, xorhi, xori;
+
+  ac_instr<Type_R> add, And, Break, bret, callr, cmpeq, cmpge, cmpgeu;
+  ac_instr<Type_R> cmplt, cmpltu, cmpne, custom, div, divu, eret, flushi, flushp;
+  ac_instr<Type_R> initi, jmp, mul, mulxss, mulxsu, mulxuu, nextpc, nor, Or, rdctl;
+  ac_instr<Type_R> roli, ror, sll, slli, sra, srai, srl, srli, sub, sync, ret, rol;
+  ac_instr<Type_R> trap, wrctl, Xor;
+
+  ac_instr<Type_J> call;
+
+  ac_asm_map reg{
+	"$"[0..31] = [0..31];
+	"r"[0..31] = [0..31];
+	"$zero" = 0;
+	"zero" = 0;	
+	"at" = 1;
+	"et" = 24;
+	"bt" = 25;
+	"gp" = 26;
+	"sp" = 27;
+	"fp" = 28;
+	"ea" = 29;
+	"ba" = 30;
+	"ra" = 31;	
+  } 
+	
+  ISA_CTOR(niosII)
+  {
+    add.set_asm("add %reg, %reg, %reg", rC, rA, rB);
+    add.set_decoder(op=0x3a, imm5=0, func=0x31);
+
+    addi.set_asm("addi %reg, %reg, %imm", rB, rA, imm16);
+    addi.set_decoder(op=0x04);
+
+    And.set_asm("and %reg, %reg, %reg", rC, rA, rB);
+    And.set_decoder(op=0x3a, imm5=0, func=0x0e);
+
+    andhi.set_asm("andhi %reg, %reg, %imm", rB, rA, imm16);
+    andhi.set_decoder(op=0x2c);
+
+    andi.set_asm("andi %reg, %reg, %imm", rB, rA, imm16);
+    andi.set_decoder(op=0x0c);
+
+    beq.set_asm("beq %reg, %reg, %expA", rA, rB, imm16);
+    beq.set_decoder(op=0x26);
+
+    bge.set_asm("bge %reg, %reg, %expA", rA, rB, imm16);
+    bge.set_decoder(op=0x0e);
+
+    bgeu.set_asm("bgeu %reg, %reg, %expA", rA, rB, imm16);
+    bgeu.set_decoder(op=0x2e);
+
+    blt.set_asm("blt %reg, %reg, %expA", rA, rB, imm16);
+    blt.set_decoder(op=0x16);
+
+    bltu.set_asm("bltu %reg, %reg, %expA", rA, rB, imm16);
+    bltu.set_decoder(op=0x36);
+
+    bne.set_asm("bne %reg, %reg, %expA", rA, rB, imm16);
+    bne.set_decoder(op=0x1e);
+
+    br.set_asm("br %expA", imm16);
+    br.set_decoder(op=0x06);
+
+    Break.set_asm("break");
+    Break.set_decoder(op=0x3a, imm5=0, func=0x34, rA=0, rB=0, rC=0x1e);
+
+    bret.set_asm("bret");
+    bret.set_decoder(op=0x3a, imm5=0, func=0x09, rA=0x1e, rB=0, rC=0);
+
+    call.set_asm("call %imm", imm26);
+    call.set_decoder(op=0x0);
+
+    callr.set_asm("callr %reg", rA);
+    callr.set_decoder(op=0x3a, imm5=0, func=0x1d, rB=0, rC=0x1f);
+
+    cmpeq.set_asm("cmpeq %reg, %reg, %reg", rC, rA, rB);
+    cmpeq.set_decoder(op=0x3a, imm5=0, func=0x20);
+
+    cmpeqi.set_asm("cmpeqi %reg, %reg, %imm", rB, rA, imm16);
+    cmpeqi.set_decoder(op=0x20);
+
+    cmpge.set_asm("cmpge %reg, %reg, %reg", rC, rA, rB);
+    cmpge.set_decoder(op=0x3a, imm5=0, func=0x08);
+
+    cmpgei.set_asm("cmpgei %reg, %reg, %imm", rB, rA, imm16);
+    cmpgei.set_decoder(op=0x08);
+
+    cmpgeu.set_asm("cmpgeu %reg, %reg, %reg", rC, rA, rB);
+    cmpgeu.set_decoder(op=0x3a, imm5=0, func=0x28);
+
+    cmpgeui.set_asm("cmpgeui %reg, %reg, %imm", rB, rA, imm16);
+    cmpgeui.set_decoder(op=0x28);
+
+    cmplt.set_asm("cmplt %reg, %reg, %reg", rC, rA, rB);
+    cmplt.set_decoder(op=0x3a, imm5=0, func=0x10);
+
+    cmplti.set_asm("cmplti %reg, %reg, %imm", rB, rA, imm16);
+    cmplti.set_decoder(op=0x10);
+
+    cmpltu.set_asm("cmpltu %reg, %reg, %reg", rC,  rA, rB);
+    cmpltu.set_decoder(op=0x3a, imm5=0, func=0x30);
+
+    cmpltui.set_asm("cmpltui %reg, %reg, %imm", rB, rA, imm16);
+    cmpltui.set_decoder(op=0x30);
+
+    cmpne.set_asm("cmpne %reg, %reg, %reg", rC,  rA, rB);
+    cmpne.set_decoder(op=0x3a, imm5=0, func=0x18);
+
+    cmpnei.set_asm("cmpnei %reg, %reg, %imm", rB, rA, imm16);
+    cmpnei.set_decoder(op=0x18);
+
+    //Modelo incorreto Verificar depois.
+    custom.set_asm("custom %reg, %reg, %reg", rC,  rA, rB);
+    custom.set_decoder(op=0x3a, imm5=0, func=0x32);
+
+    div.set_asm("div %reg, %reg, %reg", rC,  rA, rB);
+    div.set_decoder(op=0x3a, imm5=0, func=0x25);
+
+    divu.set_asm("divu %reg, %reg, %reg", rC,  rA, rB);
+    divu.set_decoder(op=0x3a, imm5=0, func=0x24);
+
+    eret.set_asm("eret");
+    eret.set_decoder(op=0x3a, imm5=0, func=0x01, rA=0x1d, rB=0, rC=0);
+
+    flushd.set_asm("flushd %imm(%reg)", imm16, rA);
+    flushd.set_decoder(op=0x3b, rB=0);
+
+    flushi.set_asm("flushi %reg", rA);
+    flushi.set_decoder(op=0x3a, imm5=0, func=0x0c, rB=0, rC=0);
+
+    flushp.set_asm("flushp");
+    flushp.set_decoder(op=0x3a, imm5=0, func=0x04, rA=0, rB=0, rC=0);
+
+    initd.set_asm("initd %imm(%reg)", imm16, rA);
+    initd.set_decoder(op=0x33, rB=0);
+
+    initi.set_asm("initi %reg", rA);
+    initi.set_decoder(op=0x3a, imm5=0, func=0x29, rB=0, rC=0);
+
+    jmp.set_asm("jmp %reg", rA);
+    jmp.set_decoder(op=0x3a, imm5=0, func=0x0d, rB=0, rC=0);
+
+    ldb.set_asm("ldb %reg, %imm(%reg)", rB, imm16, rA);
+    ldb.set_decoder(op=0x07);
+
+    ldbio.set_asm("ldbio %reg, %imm(%reg)", rB, imm16, rA);
+    ldbio.set_decoder(op=0x27);
+
+    ldbu.set_asm("ldbu %reg, %imm(%reg)", rB, imm16, rA);
+    ldbu.set_decoder(op=0x03);
+
+    ldbuio.set_asm("ldbuio %reg, %imm(%reg)", rB, imm16, rA);
+    ldbuio.set_decoder(op=0x23);
+
+    ldh.set_asm("ldh %reg, %imm(%reg)", rB, imm16, rA);
+    ldh.set_decoder(op=0x0f);
+
+    ldhio.set_asm("ldhio %reg, %imm(%reg)", rB, imm16, rA);
+    ldhio.set_decoder(op=0x2f);
+
+    ldhu.set_asm("ldhu %reg, %imm(%reg)", rB, imm16, rA);
+    ldhu.set_decoder(op=0x0b);
+
+    ldhuio.set_asm("ldhuio %reg, %imm(%reg)", rB, imm16, rA);
+    ldhuio.set_decoder(op=0x2b);
+
+    ldw.set_asm("ldw %reg, %imm(%reg)", rB, imm16, rA);
+    ldw.set_decoder(op=0x17);
+
+    ldwio.set_asm("ldwio %reg, %imm(%reg)", rB, imm16, rA);
+    ldwio.set_decoder(op=0x37);
+
+    mul.set_asm("mul %reg, %reg, %reg,", rC, rA, rB);
+    mul.set_decoder(op=0x3a, imm5=0, func=0x27);
+
+    muli.set_asm("muli %reg, %reg, %imm", rB, rA, imm16);
+    muli.set_decoder(op=0x24);
+
+    mulxss.set_asm("mulxss %reg, %reg, %reg,", rC, rA, rB);
+    mulxss.set_decoder(op=0x3a, imm5=0, func=0x1f);
+
+    mulxsu.set_asm("mulxsu %reg, %reg, %reg,", rC, rA, rB);
+    mulxsu.set_decoder(op=0x3a, imm5=0, func=0x17);
+
+    mulxuu.set_asm("mulxuu %reg, %reg, %reg,", rC, rA, rB);
+    mulxuu.set_decoder(op=0x3a, imm5=0, func=0x07);
+
+    nextpc.set_asm("nextpc %reg", rC);
+    nextpc.set_decoder(op=0x3a, imm5=0, func=0x1c);
+
+    nor.set_asm("nor %reg, %reg, %reg,", rC, rA, rB);
+    nor.set_decoder(op=0x3a, imm5=0, func=0x06);
+
+    Or.set_asm("or %reg, %reg, %reg,", rC, rA, rB);
+    Or.set_decoder(op=0x3a, imm5=0, func=0x16);
+
+    orhi.set_asm("orhi %reg, %reg, %imm", rB, rA, imm16);
+    orhi.set_decoder(op=0x34);
+
+    ori.set_asm("ori %reg, %reg, %imm", rB, rA, imm16);
+    ori.set_decoder(op=0x14);
+
+    rdctl.set_asm("rdctl %reg, %imm", rC, imm5);
+    rdctl.set_decoder(op=0x3a, func=0x26, rA=0, rB=0);
+
+    ret.set_asm("ret");
+    ret.set_decoder(op=0x3a, imm5=0, func=0x05, rC=0, rB=0);
+
+    rol.set_asm("rol %reg, %reg, %reg,", rC, rA, rB);
+    rol.set_decoder(op=0x3a, imm5=0, func=0x03);
+
+    roli.set_asm("roli %reg, %reg, %imm", rC, rA, imm5); 
+    roli.set_decoder(op=0x3a, func=0x02, rB=0);
+
+    ror.set_asm("ror %reg, %reg, %reg,", rC, rA, rB);
+    ror.set_decoder(op=0x3a, imm5=0, func=0x0b);
+
+    sll.set_asm("sll %reg, %reg, %reg,", rC, rA, rB);
+    sll.set_decoder(op=0x3a, imm5=0, func=0x13);
+
+    slli.set_asm("slli %reg, %reg, %imm", rC, rA, imm5);
+    slli.set_decoder(op=0x3a, func=0x12, rB=0);
+
+    sra.set_asm("sra %reg, %reg, %reg,", rC, rA, rB);
+    sra.set_decoder(op=0x3a, imm5=0, func=0x3b);
+
+    srai.set_asm("srai %reg, %reg, %imm", rC, rA, imm5);
+    srai.set_decoder(op=0x3a, func=0x3a, rB=0);
+
+    srl.set_asm("srl %reg, %reg, %reg,", rC, rA, rB);
+    srl.set_decoder(op=0x3a, imm5=0, func=0x1b);
+
+    srli.set_asm("srli %reg, %reg, %imm", rC, rA, imm5);
+    srli.set_decoder(op=0x3a, func=0x1a, rB=0);
+
+    stb.set_asm("stb %reg, %imm(%reg)", rB, imm16, rA);
+    stb.set_decoder(op=0x05);
+
+    stbio.set_asm("stbio %reg, %imm(%reg)", rB, imm16, rA);
+    stbio.set_decoder(op=0x25);
+
+    sth.set_asm("sth %reg, %imm(%reg)", rB, imm16, rA);
+    sth.set_decoder(op=0x0d);
+
+    sthio.set_asm("sthio %reg, %imm(%reg)", rB, imm16, rA);
+    sthio.set_decoder(op=0x2d);
+
+    stw.set_asm("stw %reg, %imm(%reg)", rB, imm16, rA);
+    stw.set_decoder(op=0x15);
+
+    stwio.set_asm("stwio %reg, %imm(%reg)", rB, imm16, rA);
+    stwio.set_decoder(op=0x35);
+
+    sub.set_asm("sub %reg, %reg, %reg,", rC, rA, rB);
+    sub.set_decoder(op=0x3a, imm5=0, func=0x39);
+
+    sync.set_asm("sync");
+    sync.set_decoder(op=0x3a, imm5=0, func=0x36, rA=0, rB=0, rC=0);
+
+    trap.set_asm("trap");
+    trap.set_decoder(op=0x3a, imm5=0, func=0x2d, rA=0, rB=0, rC=0x1d);
+
+    wrctl.set_asm("wrctl %imm, %reg", imm5, rA);
+    wrctl.set_decoder(op=0x3a, func=0x2e, rB=0, rC=0x0);
+
+    Xor.set_asm("xor %reg, %reg, %reg,", rC, rA, rB);
+    Xor.set_decoder(op=0x3a, imm5=0, func=0x1e);
+
+    xorhi.set_asm("xorhi %reg, %reg, %imm", rB, rA, imm16);
+    xorhi.set_decoder(op=0x3c);
+
+    xori.set_asm("xori %reg, %reg, %imm", rB, rA, imm16);
+    xori.set_decoder(op=0x1c);
+
+    pseudo_instr("bgt %reg, %reg, %expA"){
+	"blt %1, %0, %2";
+    }
+
+    pseudo_instr("bgtu %reg, %reg, %expA"){
+	"bltu %1, %0, %2";
+    }
+
+    pseudo_instr("ble %reg, %reg, %expA"){
+	"bge %1, %0, %2";
+    }
+
+    pseudo_instr("bleu %reg, %reg, %expA"){
+	"bgeu %1, %0, %2";
+    }
+
+    pseudo_instr("cmpgt %reg, %reg, %reg"){
+	"cmplt %0, %2, %1";
+    }
+
+    pseudo_instr("cmpgti %reg, %reg, %imm"){
+	"cmpgei %0, %1, (%2 + 1)";
+    }
+
+    pseudo_instr("cmpgtu %reg, %reg, %reg"){
+	"cmpltu %0, %2, %1";
+    }
+
+    pseudo_instr("cmpgtui %reg, %reg, %imm"){
+	"cmpgeui %0, %1, (%2 + 1)";
+    }
+
+    pseudo_instr("cmple %reg, %reg, %reg"){
+	"cmpge %0, %2, %1";
+    }
+
+    pseudo_instr("cmplei %reg, %reg, %imm"){
+	"cmplti %0, %1, (%2 + 1)";
+    }
+
+    pseudo_instr("cmpleu %reg, %reg, %reg"){
+	"cmpgeu %0, %2, %1";
+    }
+
+    pseudo_instr("cmpleui %reg, %reg, %imm"){
+	"cmpltui %0, %1, (%2 + 1)";
+    }
+
+    pseudo_instr("mov %reg, %reg"){
+	"add %0, %1, zero";
+    }
+
+    pseudo_instr("movhi %reg, %imm"){
+	"orhi %0, zero, %1";
+    }
+
+    pseudo_instr("movi %reg, %imm"){
+	"addi %0, zero, %1";
+    }
+
+    pseudo_instr("movia %reg, %imm"){
+	"orhi %0, zero, \%hiadj(%1)";
+	"addi %0, zero, \%lo(%1)";
+    }
+
+    pseudo_instr("movui %reg, %imm"){
+	"ori %0, zero, %1";
+    }
+
+    pseudo_instr("nop"){
+	"add zero, zero, zero";
+    }
+
+    pseudo_instr("subi %reg, %reg, %imm"){
+	"addi %0, %1,- %2";
+    }
+
+  };
+};
