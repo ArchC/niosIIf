@@ -1,20 +1,27 @@
-/********************************************************/
-/* The ArchC NIOSII functional model.                   */
-/* Author: Richard Maciel                               */
-/*         Guilherme Quentel Melo                       */
-/*                                                      */
-/* For more information on ArchC, please visit:         */
-/* http://www.archc.org                                 */
-/*                                                      */
-/* System Design Automation Lab (LAPS)                  */
-/* INE-UFSC                                             */
-/* http://www.laps.inf.ufsc.br                          */
-/*                                                      */
-/* The ArchC Team                                       */
-/* Computer Systems Laboratory (LSC)                    */
-/* IC-UNICAMP                                           */
-/* http://www.lsc.ic.unicamp.br                         */
-/********************************************************/
+/**
+ * @file      niosIIf_syscall.cpp
+ * @author    Richard Maciel
+ *            Guilherme Quentel Melo
+ * 
+ * @author    System Design Automation Lab (LAPS)
+ *            INE-UFSC
+ *            http://www.laps.inf.ufsc.br
+ *
+ *            The ArchC Team
+ *            http://www.archc.org/
+ *
+ *            Computer Systems Laboratory (LSC)
+ *            IC-UNICAMP
+ *            http://www.lsc.ic.unicamp.br/
+ * 
+ * @version   1.0
+ * @date      Fri, 08 Sep 2006 00:53:24 -0300
+ * 
+ * @brief     The ArchC Nios II functional model
+ * 
+ * @attention Copyright (C) 2002-2006 --- The ArchC Team
+ *
+ */
 
 #include "niosIIf_syscall.H"
 #include "ac_resources.H"
